@@ -1,0 +1,10 @@
+{
+    "name": "catalog-extract",
+    "author": "Jeff Blaisdell",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+    	"async": ">=0.1.22",
+    	"mongodb": ">=1.1.11"
+    }
+}
