@@ -3,18 +3,18 @@ var fs = require('fs'),
     async = require('async'),
     DataLoad = require('./data-load');
 
-var CatalogProductGroupLoad = function(opts) {
+var CatalogLoad = function(opts) {
 	this.db = opts.db;
 	this.loadFilePathRoot = opts.loadFilePathRoot;
-	this.loadFilePath = this.loadFilePathRoot + "catalog-product-groups\\";
-	this.databaseTable = "catalog_product_groups";
+	this.loadFilePath = this.loadFilePathRoot + "catalogs\\";
+	this.databaseTable = "catalogs";
 };  
 
-CatalogProductGroupLoad.prototype = new DataLoad();
+CatalogLoad.prototype = new DataLoad();
 
-CatalogProductGroupLoad.prototype.constructor  = CatalogProductGroupLoad;
+CatalogLoad.prototype.constructor  = CatalogLoad;
 
-CatalogProductGroupLoad.prototype.load = function() {
+CatalogLoad.prototype.load = function() {
 	var self = this;
 
 	fs.readdir(self.loadFilePath, function(err, files) {
@@ -35,7 +35,7 @@ CatalogProductGroupLoad.prototype.load = function() {
 
 };
 
-module.exports = CatalogProductGroupLoad;
+module.exports = CatalogLoad;
 
 var loadFile = function(file) {
 	console.log(file);

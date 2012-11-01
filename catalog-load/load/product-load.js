@@ -6,7 +6,7 @@ var fs = require('fs'),
 var ProductLoad = function(opts) {
 	this.db = opts.db;
 	this.loadFilePathRoot = opts.loadFilePathRoot;
-	this.loadFilePath = this.loadFilePathRoot + "product\\";
+	this.loadFilePath = this.loadFilePathRoot + "products\\";
 	this.databaseTable = "products";
 };  
 

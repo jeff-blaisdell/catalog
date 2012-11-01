@@ -3,16 +3,16 @@ var fs = require('fs'),
     async = require('async'),
     DataLoad = require('./data-load');
 
-var AffiliateCatalogLoad = function(opts) {
+var CustomerCatalogLoad = function(opts) {
 	this.db = opts.db;
 	this.loadFilePathRoot = opts.loadFilePathRoot;
-	this.loadFilePath = this.loadFilePathRoot + "affiliate-catalogs\\";
-	this.databaseTable = "affiliate_catalogs";
+	this.loadFilePath = this.loadFilePathRoot + "customer-catalogs\\";
+	this.databaseTable = "customer_catalogs";
 };  
 
-util.inherits(AffiliateCatalogLoad, DataLoad);
+util.inherits(CustomerCatalogLoad, DataLoad);
 
-AffiliateCatalogLoad.prototype.load = function() {
+CustomerCatalogLoad.prototype.load = function() {
 	var self = this;
 
 	fs.readdir(self.loadFilePath, function(err, files) {
@@ -25,7 +25,7 @@ AffiliateCatalogLoad.prototype.load = function() {
 
 		if (files) {
 			async.forEach(files, loadFile, function(err) {
-				console.log("Unable to load affiliate catalogs.");
+				console.log("Unable to load customer catalogs.");
 				console.log(err);
 			});
 		}
@@ -33,7 +33,7 @@ AffiliateCatalogLoad.prototype.load = function() {
 
 };
 
-module.exports = AffiliateCatalogLoad;
+module.exports = CustomerCatalogLoad;
 
 var loadFile = function(file) {
 	console.log(file);

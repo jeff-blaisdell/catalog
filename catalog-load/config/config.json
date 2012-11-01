@@ -1,9 +1,10 @@
 {
-	"loadFilePathRoot" : "C:\\Jeff\\data\\",
+	"loadFilePathRoot" : "C:\\Users\\Jeff\\Documents\\GitHub\\catalog\\catalog-data\\",
 	"mongoHost" : "localhost",
-	"mongoPort" : "27017",
-	"mongoServerOptions" : {"poolSize" : "5",
-	                        "socketOptions" : {"keepAlive" : "1"}
+	"mongoPort" : 27017,
+	"mongoServerOptions" : {"poolSize" : 5,
+	                        "socketOptions" : {"keepAlive" : 1},
+	                        "safe" : true
 	                       },
 	"mongoSchemaName" : "products",
 	"mongoDbOptions" : {}

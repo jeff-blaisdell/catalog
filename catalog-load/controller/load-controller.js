@@ -1,7 +1,7 @@
 var fs = require('fs'),
     properties = require('../config/config.json'),
-    AffiliateCatalogLoad = require('../load/affiliate-catalog-load'),
-    CatalogProductGroupLoad = require('../load/catalog-product-group-load'),
+    CustomerCatalogLoad = require('../load/customer-catalog-load'),
+    CatalogLoad = require('../load/catalog-load'),
     ProductLoad = require('../load/product-load'),
     mongodb = require("mongodb"),
     mongoserver = new mongodb.Server(properties.mongoHost, properties.mongoPort, properties.mongoServerOptions),
@@ -20,12 +20,12 @@ LoadController.prototype.begin = function() {
             throw err;
         }
 
-        var affiliateCatalogLoad = new AffiliateCatalogLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
-        var catalogProductGroupLoad = new CatalogProductGroupLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
+        var customerCatalogLoad = new CustomerCatalogLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
+        var catalogLoad = new CatalogLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
         var productLoad = new ProductLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
 
-        affiliateCatalogLoad.load();
-        catalogProductGroupLoad.load();
+        customerCatalogLoad.load();
+        catalogLoad.load();
         productLoad.load();
 
     });
