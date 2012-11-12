@@ -1,17 +1,15 @@
 var fs = require('fs'),
-    properties = require('../config/config.json'),
-    CustomerCatalogLoad = require('../load/customer-catalog-load'),
-    CatalogLoad = require('../load/catalog-load'),
-    ProductLoad = require('../load/product-load'),
+    props = require('../config/config.json'),
     mongodb = require("mongodb"),
-    mongoserver = new mongodb.Server(properties.mongoHost, properties.mongoPort, properties.mongoServerOptions),
-    db_connector = new mongodb.Db(properties.mongoSchemaName, mongoserver, properties.mongoDbOptions);;
+    DataLoad = require("../load/data-load"),
+    mongoserver = new mongodb.Server(props.mongoHost, props.mongoPort, props.mongoServerOptions),
+    db_connector = new mongodb.Db(props.mongoSchemaName, mongoserver, props.mongoDbOptions);;
 
 
 var LoadController = function() {
 };  
 
-LoadController.prototype.begin = function() {
+LoadController.prototype.load = function() {
 
     db_connector.open(function(err, db){
         if (err) {
@@ -20,14 +18,22 @@ LoadController.prototype.begin = function() {
             throw err;
         }
 
-        var customerCatalogLoad = new CustomerCatalogLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
-        var catalogLoad = new CatalogLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
-        var productLoad = new ProductLoad({ "loadFilePathRoot" : properties.loadFilePathRoot, "db" : db });
+        var load = new DataLoad({ "rootFilePath" : props.rootFilePath, "db" : db });
 
-        customerCatalogLoad.load();
-        catalogLoad.load();
-        productLoad.load();
+        load.on("files-loaded", function() {
+            console.log("Files are processed!");
+            db.close(true, function(err, result) {
+                if (err) {
+                    console.log("Failure.");
+                    console.log(err);
+                    throw err;
+                }
+                console.log("Database connection closed.");
+                console.log("Finished.");
+            });
+        });
 
+        load.start();
     });
 
 };
