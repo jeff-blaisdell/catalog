@@ -1,21 +1,34 @@
-var fs = require('fs');
+var Q = require('q'),
+	fs = require('fs');
 
-var process = function(file, callback) {
-	var self = this;
-	var db = self.db;
+var process = function(filePath, file, opts) {
+	var self = this,
+		db = opts.db,
+		deferred = Q.defer();
 
-	fs.readFile(file, function(err, data) {
+	fs.readFile(filePath + "\\" + file, function(err, data) {
 		if (err) {
-			throw err;
+			console.log(["Error reading file.", err]);
+			deferred.reject(new Error(err));
 		}
-		var i = file.lastIndexOf("\\");
-		var fileName = file.substr(i, file.lenth).split(".");
-		var id = fileName[0];
+		var id = getId(file);
 		var record = { _id : id, groups : JSON.parse(data).groups };
+		console.log(["RECORD: ", record]);
 		db.collection("catalogs").update(record, {safe : true, upsert : true}, function(err, doc) {
-			callback.call(self, file);
+			if (err) {
+				console.log(["Error writing to db.", err]);
+				deferred.reject(new Error(err));
+			}
+			deferred.resolve(file);
 		});
 	});
-};  
+
+	return deferred.promise;
+}; 
+
+var getId = function(file)  {
+	s = file.split(".");
+	return s[0];
+}; 
 
 module.exports = process;

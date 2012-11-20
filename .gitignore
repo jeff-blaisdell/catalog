@@ -8,6 +8,8 @@
 bin/
 tmp/
 node_modules
+*.json.inprocess
+*.json.complete
 *.tmp
 *.bak
 *.swp

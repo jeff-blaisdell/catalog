@@ -1,5 +1,5 @@
 {
-	"rootFilePath" : "..\\..\\catalog-data\\",
+	"rootFilePath" : "C:\\Users\\blaisj1\\Documents\\GitHub\\catalog\\catalog-data\\",
 	"mongoHost" : "localhost",
 	"mongoPort" : 27017,
 	"mongoServerOptions" : {"poolSize" : 5,

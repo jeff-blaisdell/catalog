@@ -1,0 +1,9 @@
+{
+    "name": "catalog-data",
+    "author": "Jeff Blaisdell",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+    	"q" : ">=0.8.10"
+    }
+}
