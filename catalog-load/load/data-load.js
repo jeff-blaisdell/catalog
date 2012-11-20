@@ -1,7 +1,13 @@
 var fs = require('fs'),
 	_ = require('underscore'),
+	Q = require('q'),
+	Process = require('../model/process'),
     async = require('async'),
-    events = require('events');
+    events = require('events'),
+    readDir = Q.nbind(fs.readdir),
+    renameFile = Q.nbind(fs.rename);
+
+
 
 var DataLoad = function(opts) {
 	this.files = [];
@@ -11,6 +17,104 @@ var DataLoad = function(opts) {
 };
 
 DataLoad.prototype = new events.EventEmitter;
+
+
+DataLoad.prototype.load = function() {
+
+	var self = this;
+	var rootPath = self.rootPath;
+	var getProcesses = Q.nbind(FN.getProcesses, self);
+
+	readDir.call(self, rootPath)
+	.then(getProcesses)
+	.then(function(processes) {
+		processes.forEach(function(p) {
+			console.log(p);
+		});
+	})
+	.fail(function(error) {
+		console.log(error);
+		throw error;
+	})
+	.done();
+
+	self.emit("files-loaded");
+};
+
+var FN = {
+	processFolder : function(folder) {
+		var self = this;
+		var rootPath = self.rootPath;
+		var processor = require(rootPath + folder + "\\process.js");
+		readDir.call(self, rootPath + folder)
+		.then(function(files) {
+			return files.filter(function(file) {
+				if (file.match(/.*\.json.inprocess$/)) {
+					return true;
+				} else if (file.match(/.*\.json$/)) {
+					renameFile.call(file, rootPath + folder + "\\" + file, rootPath + folder + "\\" + file + ".inprocess")
+					.then(function() {
+						file = file + ".inprocess";
+						return true;
+					})
+					.done();
+				}
+				return false;
+			});
+		})
+		.then(function(files) {
+			var x = files.map(function(file) {
+				return new Process(rootPath + folder, file, processor);
+			});
+			processes = processes.concat(x);
+			console.log(processes.length);
+		})
+		.fail(function(error) {
+			console.log(error);
+			throw error;
+		})
+		.done();		
+	},
+	getProcesses : function(folders) {
+		var self = this;
+		var deferred = Q.defer();
+		var rootPath = self.rootPath;
+		var fn = Q.nbind(FN.processFolder, self);
+
+		return Q.fcall(function() {
+			var processes = [];
+			var promises = [];
+			folders.forEach(function(folder) {
+				promises.push(
+					Q.fcall(fn, folder)
+				);
+			});
+			Q.all(promises)
+			.then(function() {
+				console.log(processes);
+				return processes;
+			})
+			.done();
+		});
+	}
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 DataLoad.prototype.start = function() {
 	var self = this;

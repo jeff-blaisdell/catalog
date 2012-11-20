@@ -33,7 +33,7 @@ LoadController.prototype.load = function() {
             });
         });
 
-        load.start();
+        load.load();
     });
 
 };
