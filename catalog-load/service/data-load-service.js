@@ -163,7 +163,7 @@ var PRIVATE = {
 		 * and filter out non-processable files.
 		 */
 		.then(function(files) {
-			return files.filter(PRIVATE.filterFile(rootPath, directory));
+			return files.filter(PRIVATE.filterFile);
 		})
 
 		.then(function(files) {
