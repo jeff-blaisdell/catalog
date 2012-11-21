@@ -30,15 +30,7 @@ DataLoadService.prototype.load = function() {
 	 * Filter out Node specific directories.
 	 */
 	.then(function(directories) {
-		return directories.filter(function(directory) {
-			if (directory.match(/node_modules$/)) {
-				return false;
-			} else if (directory.match(/package.json$/)) {
-				return false;
-			} else {
-				return true;
-			}
-		});
+		return directories.filter(PRIVATE.filterDirectory);
 	})	
 
 	/**
@@ -175,11 +167,44 @@ var PRIVATE = {
 		})
 
 		.then(function(files) {
-			return PRIVATE.makeProcesses(rootPath, directory, processor, opts)(files);
-		})
+			/**
+			 * Mark batch as Inprocess.
+			 */
+			var f = files.map(function(file) {
+				return PRIVATE.markInprocess(rootPath, directory, file);
+			});
 
-		.then(function(processes) {
-			deferred.resolve(processes);
+			/**
+			 * Wait for all files renames to complete.
+			 */
+			Q.all(f)
+			
+			/**
+			 * Create processes.
+			 */			
+			.then(function(files) {
+				return PRIVATE.makeProcesses(rootPath, directory, processor, opts)(files);
+			})
+
+			/**
+			 * Return processes to caller.
+			 */			
+			.then(function(processes) {
+				deferred.resolve(processes);
+			})
+
+			/**
+		 	* Handle any exceptions.
+		 	*/
+			.fail(function(error) {
+				console.log(error);
+				throw error;
+			})
+
+			/**
+		 	 * Terminate promise chain.
+		 	 */
+			.done();			
 		})
 
 		/**
@@ -202,29 +227,55 @@ var PRIVATE = {
 	/**
 	 * FilterFile contains logic related to which
 	 * files are eligible for processing.
-	 * It is also responsible for initialize file as inprocess.
 	 * RETURN: boolean
 	 */
-	filterFile : function(rootPath, directory) {
-		return function(file) {
-			if (file.match(/.*\.json.inprocess$/)) {
-				return true;
-			} else if (file.match(/.*\.json$/)) {
-				renameFile.call(file, rootPath + directory + "\\" + file, rootPath + directory + "\\" + file + ".inprocess")
-				.then(function() {
-					file = file + ".inprocess";
-					return true;
-				})
-				.fail(function(error) {
-					console.log(error);
-					throw error;
-				})			
-				.done();
-
-				return false;
-			}
-			return false;
+	filterFile : function(file) {
+		if (file.match(/.*\.json.inprocess$/)) {
+			return true;
+		} else if (file.match(/.*\.json$/)) {
+			return true;
 		}
+		return false;
+	},
+
+	/**
+	 * FilterDirectory contains logic related to which
+	 * directories are eligible for processing.
+	 * RETURN: boolean
+	 */
+	filterDirectory : function(directory) {
+		if (directory.match(/node_modules$/)) {
+			return false;
+		} else if (directory.match(/package.json$/)) {
+			return false;
+		} else {
+			return true;
+		}
+	},
+
+	/**
+	 * Will set file name to represent a state of inprocess.
+	 * RETURN: Filename
+	 */
+	markInprocess : function(rootPath, directory, file) {
+		var deferred = Q.defer();
+		
+		if (file.match(/.*\.json$/)) {
+			var fileInprocess = file + ".inprocess"
+			renameFile(rootPath + directory + "\\" + file, rootPath + directory + "\\" + fileInprocess)
+			.then(function() {
+				return deferred.resolve(fileInprocess);
+			})
+			.fail(function(error) {
+				console.log(error);
+				throw error;
+			})			
+			.done();
+		} else {
+			return file;
+		}
+		
+		return deferred.promise;
 	},
 
 	/**
@@ -240,7 +291,10 @@ var PRIVATE = {
 		}
 	},
 
-
+	/**
+	 * Terminate MongoDB connections.
+	 * RETURN: void
+	 */
 	closeDB : function(db) {
 		db.close(true, function(err, result) {
 			if (err) {

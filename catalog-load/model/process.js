@@ -18,11 +18,34 @@ Process.prototype.execute = function() {
 
 	self.processor(self.filePath, self.file, self.opts)
 	.then(function(file) {
-		renameFile(self.filePath+ "\\" + file, self.filePath+ "\\" + file.replace(/.inprocess/, ".complete"))
+		PRIVATE.markComplete(self.filePath, self.file)
+		.then(function(file) {
+			deferred.resolve(file);	
+		})
+	})
+	.fail(function(error) {
+		console.log(error);
+		throw error;
+	})	
+	.done();
+
+	return deferred.promise;
+};
+
+module.exports = Process;
+
+
+
+var PRIVATE = {
+	markComplete = function(filePath, file) {
+
+		var deferred = Q.defer();
+		var fileComplete = file.replace(/.inprocess/, ".complete");
+
+		renameFile(filePath+ "\\" + file, filePath+ "\\" + fileComplete)
 		.then(function() {
-			self.file = self.file + ".complete";
-			console.log("File processed. " + self.file);
-		deferred.resolve(self.file);			
+			console.log("File processed. " + fileComplete);
+			deferred.resolve(fileComplete);		
 		})
 		.fail(function(error) {
 			console.log(error);
@@ -30,11 +53,6 @@ Process.prototype.execute = function() {
 		})	
 		.done();
 
-
-	})
-	.done();
-
-	return deferred.promise;
+		return deferred.promise;
+	}
 };
-
-module.exports = Process;

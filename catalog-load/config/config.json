@@ -2,7 +2,7 @@
 	"rootFilePath" : "C:\\Users\\Jeff\\Documents\\GitHub\\catalog\\catalog-data\\",
 	"mongoHost" : "localhost",
 	"mongoPort" : 27017,
-	"mongoServerOptions" : {"poolSize" : 10,
+	"mongoServerOptions" : {"poolSize" : 25,
 	                        "socketOptions" : {"keepAlive" : 1}
 	                       },
 	"mongoSchemaName" : "products",
