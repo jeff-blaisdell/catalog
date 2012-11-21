@@ -13,7 +13,7 @@ var process = function(filePath, file, opts) {
 		}
 		var id = getId(file);
 		var record = { _id : id, catalogs : JSON.parse(data).webAffiliateCatalogs };
-		console.log(["RECORD: ", record]);
+
 		db.collection("customer_catalogs").update(record, {safe : true, upsert : true}, function(err, doc) {
 			if (err) {
 				console.log(["Error writing to db.", err]);
