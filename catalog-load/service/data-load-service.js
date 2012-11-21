@@ -17,7 +17,7 @@ DataLoadService.prototype = new events.EventEmitter;
 
 
 DataLoadService.prototype.load = function() {
-	var opts = this;
+	var opts = this,
 		rootPath = opts.rootPath;
 
 	/**
@@ -128,7 +128,6 @@ var PRIVATE = {
 			 *
 			 */			
 			.then(function(processes) {
-				console.log(processes.length);
 				deferred.resolve(processes);
 			})
 
@@ -156,10 +155,10 @@ var PRIVATE = {
 	 */
 	processDirectory : function(directory, opts) {
 		var rootPath = opts.rootPath,
-		    deferred = Q.defer();
-		    makeProcesses = Q.nbind(PRIVATE.makeProcesses, opts);
-		    processor = require(rootPath + directory + "\\process.js");
-		    console.log(rootPath + directory + "\\process.js");
+		    deferred = Q.defer(),
+		    makeProcesses = Q.nbind(PRIVATE.makeProcesses, opts),
+		    module = rootPath + directory + "\\process",
+		    processor = require(module);
 
 		/**
 		 * Read all files from parameterized directory.
