@@ -37,7 +37,7 @@ module.exports = Process;
 
 
 var PRIVATE = {
-	markComplete = function(filePath, file) {
+	markComplete : function(filePath, file) {
 
 		var deferred = Q.defer(),
 			fileComplete = file.replace(/.inprocess/, ".complete");
