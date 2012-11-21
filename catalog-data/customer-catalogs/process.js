@@ -14,13 +14,19 @@ var process = function(filePath, file, opts) {
 		var id = getId(file);
 		var record = { _id : id, catalogs : JSON.parse(data).webAffiliateCatalogs };
 
-		db.collection("customer_catalogs").update(record, {safe : true, upsert : true}, function(err, doc) {
+		db.collection("customer_catalogs", function(err, collection) {
 			if (err) {
-				console.log(["Error writing to db.", err]);
+				console.log(["Error selecting collection.", err]);
 				deferred.reject(new Error(err));
 			}
-			deferred.resolve(file);
-		});
+			collection.update({ _id : id }, record, {safe : true, upsert : true}, function(err, doc) {
+				if (err) {
+					console.log(["Error writing to db.", err]);
+					deferred.reject(new Error(err));
+				}
+				deferred.resolve(file);
+			});
+		});		
 	});
 
 	return deferred.promise;
