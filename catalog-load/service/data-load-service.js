@@ -75,6 +75,7 @@ DataLoadService.prototype.load = function() {
 	    * Terminate promise chain.
 	    */		
 		.done();		
+
 	})
 
 };

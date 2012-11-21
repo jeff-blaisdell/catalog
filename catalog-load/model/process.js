@@ -1,5 +1,7 @@
 var Q = require('q'),
-	events = require('events');
+	fs = require('fs'),
+	events = require('events'),
+	renameFile = Q.nbind(fs.rename);
 
 var Process = function(filePath, file, processor, opts) {
 	this.filePath = filePath;
@@ -12,30 +14,24 @@ Process.prototype = new events.EventEmitter;
 
 Process.prototype.execute = function() {
 	var self = this,
-		deferred = Q.defer(),
-		fn = Q.nbind(self.processor);
+		deferred = Q.defer();
 
-	fn.call(self, self.filePath, self.file, self.opts)
-
-	/**
-	 * Executor callback.
-	 */		
+	self.processor(self.filePath, self.file, self.opts)
 	.then(function(file) {
-		console.log("File Processed. " + self.filePath + "\\" + self.file);
-		deferred.resolve(file);
+		renameFile(self.filePath+ "\\" + file, self.filePath+ "\\" + file.replace(/.inprocess/, ".complete"))
+		.then(function() {
+			self.file = self.file + ".complete";
+			console.log("File processed. " + self.file);
+		deferred.resolve(self.file);			
+		})
+		.fail(function(error) {
+			console.log(error);
+			throw error;
+		})	
+		.done();
+
+
 	})
-
-	/**
-	 * Handle any exceptions.
-	 */		
-	.fail(function(error) {
-		console.log(error);
-		throw error;
-	})	
-
-	/**
-	 * Terminate promise chain.
-	 */	
 	.done();
 
 	return deferred.promise;
