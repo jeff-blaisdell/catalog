@@ -13,7 +13,6 @@ var process = function(filePath, file, opts) {
 		}
 		var id = getId(file);
 		var record = { _id : id, product : JSON.parse(data).product };
-		console.log(["RECORD: ", record]);
 
 		db.collection("products").update(record, {safe : true, upsert : true}, function(err, doc) {
 			if (err) {
